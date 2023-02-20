@@ -33,8 +33,10 @@ app.listen(PORT ,()=>{
 
 // for get users
 app.get('/api/users',(req, res)=>{
-  const sql_query= `select * from users`
-  db.query(sql_query,(err, result)=>{
+  const email = req.query.email;
+  console.log(email )
+const sql_query= `select * from users WHERE user_email= ?  `
+  db.query(sql_query,email ,  (err, result)=>{
     if(err) throw err;
     res.send(result)
   })
