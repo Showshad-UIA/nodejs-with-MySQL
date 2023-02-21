@@ -104,3 +104,7 @@ app.patch('/api/users/:user_id',(req, res)=>{
   })
 })
 
+app.get('/',(req, res) => {
+  res.send('your server side is successful readable')
+})
+
