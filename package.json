@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "server": "nodemon database.js",
+    "start":"node database.js",
+    "start-dev": "nodemon database.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
