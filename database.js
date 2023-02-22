@@ -103,9 +103,10 @@ app.patch("/api/users/:user_id", (req, res) => {
 });
 
 // get consultant information
-app.get("/api/consultantInfo", (req, res) => {
+app.get("/api/consultantInfo",async(req, res) => {
   const email = req.query.email;
   const sql_query = `select * from consultant WHERE user_email= ?  `;
+  // const result = await sql_query
   db.query(sql_query, email, (err, result) => {
     if (err) {
       res.status(400).send({
@@ -123,7 +124,7 @@ app.get("/api/consultantInfo", (req, res) => {
   });
 });
 app.post("/api/consultantInfo", (req, res) => {
-  const { profession,summery, user_email, } = req.body;
+  const { profession,summery, user_email } = req.body;
   const sqlPost = `INSERT INTO consultant (profession,summery, user_email) VALUES(?,?,?)`;
   db.query(sqlPost, [profession,summery, user_email,], (err, result) => {
     if (err) {
@@ -139,6 +140,32 @@ app.post("/api/consultantInfo", (req, res) => {
       data: result,
     });
   });
+});
+// update consultant info
+app.patch("/api/consultantInfo/:cons_id",async (req, res) => {
+  const { cons_id } = req.params;
+  const { profession,summery, user_email} = req.body;
+  const consUpdate = `UPDATE consultant SET profession= ? , summery= ? , user_email= ? WHERE cons_id = ?`;
+  // const result = consUpdate
+  db.query( 
+    consUpdate,
+    [profession,summery, user_email,cons_id],
+    (err, result) => {
+      if (err) {
+        res.status(400).send({
+          status: "Field",
+          message: "Couldn't update consultant profile",
+          data: err.message,
+        });
+      } else {
+        res.status(200).send({
+          status: "success",
+          message: "Updated data",
+          data: result,
+        });
+      }
+    }
+  );
 });
 
 
