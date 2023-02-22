@@ -10,9 +10,9 @@ const colors = require('colors');
 
 const db =msql.createConnection({
   host: 'localhost',
-  database: 'australia_scholarchip',
+  database: 'australia_scholarship',
   user: 'root',
-  password: 'MAS$$UM',
+  password: 'raihanul2019',
 });
 const app = express();
 const PORT =5000;
