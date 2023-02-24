@@ -27,13 +27,25 @@ app.listen(PORT, () => {
 });
 
 // for get users
-app.get("/api/users", (req, res) => {
+app.get("/api/users", async (req, res) => {
   const email = req.query.email;
   const sql_query = `select * from users WHERE user_email= ?  `;
   db.query(sql_query, email, (err, result) => {
-    if (err) throw err;
-    res.send(result);
+    if (err) {
+      res.status(400).send({
+        status: "failed",
+        message: "Not gets you data.",
+        error: err.message,
+      });
+    } else {
+      res.status(200).send({
+        status: "success",
+        message: "Yes gets you data.",
+        data: result,
+      });
+    }
   });
+
 });
 
 //for added users
@@ -103,7 +115,7 @@ app.patch("/api/users/:user_id", (req, res) => {
 });
 
 // get consultant information
-app.get("/api/consultantInfo",async(req, res) => {
+app.get("/api/consultantInfo", async (req, res) => {
   const email = req.query.email;
   const sql_query = `select * from consultant WHERE user_email= ?  `;
   // const result = await sql_query
@@ -124,9 +136,9 @@ app.get("/api/consultantInfo",async(req, res) => {
   });
 });
 app.post("/api/consultantInfo", (req, res) => {
-  const { profession,summery, user_email } = req.body;
+  const { profession, summery, user_email } = req.body;
   const sqlPost = `INSERT INTO consultant (profession,summery, user_email) VALUES(?,?,?)`;
-  db.query(sqlPost, [profession,summery, user_email,], (err, result) => {
+  db.query(sqlPost, [profession, summery, user_email], (err, result) => {
     if (err) {
       res.status(400).send({
         status: "Field",
@@ -142,14 +154,14 @@ app.post("/api/consultantInfo", (req, res) => {
   });
 });
 // update consultant info
-app.patch("/api/consultantInfo/:cons_id",async (req, res) => {
+app.patch("/api/consultantInfo/:cons_id", async (req, res) => {
   const { cons_id } = req.params;
-  const { profession,summery, user_email} = req.body;
+  const { profession, summery, user_email } = req.body;
   const consUpdate = `UPDATE consultant SET profession= ? , summery= ? , user_email= ? WHERE cons_id = ?`;
   // const result = consUpdate
-  db.query( 
+  db.query(
     consUpdate,
-    [profession,summery, user_email,cons_id],
+    [profession, summery, user_email, cons_id],
     (err, result) => {
       if (err) {
         res.status(400).send({
@@ -168,6 +180,55 @@ app.patch("/api/consultantInfo/:cons_id",async (req, res) => {
   );
 });
 
+// user types get
+
+app.get("/api/usersTypes",(req, res) => {
+    const userTypesGet =` 
+    SELECT u.user_name, 
+    u.user_email, 
+    utm.user_types_method
+    FROM users u
+    JOIN user_types ut ON u.user_id =ut.user_id
+    JOIN user_types_method utm ON  utm.user_type_id = ut.user_type
+    `
+    db.query(userTypesGet,(err,result)=>{
+      if(err){
+        res.status(400).send({
+          status:"Field",
+          message:"Could'nt find userTypes",
+          err:err.message
+        })
+      }
+      else{
+        res.status(200).send({
+          status:"success", 
+          message:"successfully get userTypes data",
+          data:result
+        })
+      }
+    })
+
+})
+
+//user types add
+app.post("/api/usersTypes", (req, res) => {
+  const { user_id, user_type } = req.body;
+  const userTypeAdd = `INSERT INTO user_types ( user_id, user_type) VALUES(?,?)`;
+  db.query(userTypeAdd, [ user_id, user_type], (err, result) => {
+    if (err) {
+      res.status(400).send({
+        status: "Field",
+        message: "Couldn't add users types on database",
+        data: err.message,
+      });
+    }
+    res.status(200).send({
+      status: "success",
+      message: "Data users types saved successfully",
+      data: result,
+    });
+  });
+});
 
 app.get("/", (req, res) => {
   res.send("your server side is successful readable");
